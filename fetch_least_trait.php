@@ -44,22 +44,27 @@ function countUnknownTraits(array $heroes, array $knownTraits) {
     return array_filter($traitCounts, fn($c) => $c > 0);
 }
 
-// Если передан один или ни одного трейта
+// Подсчитываем текущее множество героев
+$currentWhere = buildWhere($traitScores);
+$stmt = $conn->prepare("SELECT * FROM characters WHERE $currentWhere");
+$stmt->execute();
+$heroes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$currentCount = count($heroes);
+
+// Если никого не найдено
+if ($currentCount === 0) {
+    echo json_encode(["error" => "Мы не знаем героев которые подходят под описание..."]);
+    exit();
+}
+
+// Если найден ровно один герой — сразу возвращаем его
+if ($currentCount === 1) {
+    echo json_encode(["id" => $heroes[0]['id']]);
+    exit();
+}
+
+// Если передан только один трейт или ни одного
 if (count($traitScores) <= 1) {
-    $whereSql = buildWhere($traitScores);
-    $stmt = $conn->prepare("SELECT * FROM characters WHERE $whereSql");
-    $stmt->execute();
-    $heroes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    if (!$heroes) {
-        echo json_encode(["error" => "Мы не знаем героев которые подходят под описание..."]);
-        exit();
-    }
-    if (count($heroes) === 1) {
-        echo json_encode(["id" => $heroes[0]['id']]);
-        exit();
-    }
-
     $traitCounts = countUnknownTraits($heroes, $traitScores);
 
     if (empty($traitCounts)) {
@@ -76,7 +81,6 @@ if (count($traitScores) <= 1) {
     }
 
     $traitKeys = array_slice($traitKeys, $dontKnowValue);
-
     $nextMinCount = $traitCounts[$traitKeys[0]];
     $candidates = array_filter($traitKeys, fn($key) => $traitCounts[$key] === $nextMinCount);
     $randomTrait = $candidates[array_rand($candidates)];
@@ -85,11 +89,11 @@ if (count($traitScores) <= 1) {
     exit();
 }
 
-// Более одного трейта
-$keys = array_keys($traitScores);
+// Более одного трейта — продолжаем анализ
+$keys = array_keys(array_diff_key($traitScores, ['dontKnowValue' => 1]));
 $lastTrait = end($keys);
 
-// Собираем карту предыдущих трейтов
+// Собираем карту предыдущих трейтов (без последнего)
 $prevTraitScores = $traitScores;
 if ($lastTrait !== false) {
     unset($prevTraitScores[$lastTrait]);
@@ -100,24 +104,6 @@ $prevWhere = buildWhere($prevTraitScores);
 $stmtPrev = $conn->prepare("SELECT COUNT(*) FROM characters WHERE $prevWhere");
 $stmtPrev->execute();
 $previousCount = (int) $stmtPrev->fetchColumn();
-
-// Подсчитываем текущее множество героев
-$currentWhere = buildWhere($traitScores);
-$stmt = $conn->prepare("SELECT * FROM characters WHERE $currentWhere");
-$stmt->execute();
-$heroes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-$currentCount = count($heroes);
-
-if ($currentCount === 0) {
-    echo json_encode(["error" => "Мы не знаем героев которые подходят под описание..."]);
-    exit();
-}
-
-if ($currentCount === 1) {
-    $hero = $heroes[0];
-    echo json_encode(["id" => $hero['id']]);
-    exit();
-}
 
 // Подсчитываем единички по неизвестным трейтам
 $traitCounts = countUnknownTraits($heroes, $traitScores);
@@ -136,7 +122,6 @@ if (count($traitKeys) <= $dontKnowValue) {
 }
 
 $traitKeys = array_slice($traitKeys, $dontKnowValue);
-
 $nextMinCount = $traitCounts[$traitKeys[0]];
 $candidates = array_filter($traitKeys, fn($key) => $traitCounts[$key] === $nextMinCount);
 $randomTrait = $candidates[array_rand($candidates)];
@@ -149,4 +134,3 @@ echo json_encode([
     "trait" => $randomTrait,
     "ratio" => $ratio
 ]);
-?>
