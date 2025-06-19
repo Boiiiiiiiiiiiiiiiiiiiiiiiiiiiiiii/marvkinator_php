@@ -17,3 +17,4 @@
   catch(PDOEception $e){
     echo "Connection failed: ". $e->getMessage();
   }
+?>
