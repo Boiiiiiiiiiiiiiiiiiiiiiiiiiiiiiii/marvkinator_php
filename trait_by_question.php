@@ -26,6 +26,10 @@
       echo json_encode(["error" => "No matching trait found."]);
     }
   } catch (Exception $e) {
-    echo json_encode(["error" => $e->getMessage()]);
+      echo json_encode([
+          "error" => $e->getMessage(),
+          "trace" => $e->getTraceAsString(),
+          "input" => $_GET['question'] ?? null
+      ]);
   }
 ?>
