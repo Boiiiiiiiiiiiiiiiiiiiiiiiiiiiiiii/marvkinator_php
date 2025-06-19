@@ -8,7 +8,7 @@
   $username = "ukycwrgkfpwjwphl";
   $password = "T8TpccLSsiSoNeitHtjS";
   $dbname = "bqgwxblgaohhiogylvnt";
-  $port = "your-new-port";
+  $port = "3306";
 
   try {
     $conn = new PDO("mysql:host=$servername;dbname=$dbname;charset=utf8mb4", $username, $password);
