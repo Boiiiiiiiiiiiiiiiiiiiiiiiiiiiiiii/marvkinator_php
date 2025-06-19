@@ -9,7 +9,7 @@
 
   $trait = $_GET['trait'];
 
-  $sql = "SELECT question FROM traits_questions_table WHERE trait = :trait"; // <- FIXED HERE
+  $sql = "SELECT question FROM traits_questions WHERE trait = :trait"; // <- FIXED HERE
   $stmt = $conn->prepare($sql);
   $stmt->bindParam(":trait", $trait);
   $stmt->execute();
