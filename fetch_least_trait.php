@@ -149,4 +149,3 @@ echo json_encode([
     "trait" => $randomTrait,
     "ratio" => $ratio
 ]);
-?>
