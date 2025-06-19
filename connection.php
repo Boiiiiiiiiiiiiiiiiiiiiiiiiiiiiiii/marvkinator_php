@@ -4,10 +4,10 @@
   header('Content-Type: application/json');
   header("Access-Control-Allow-Origin: *");
 
-  $servername = "bncjpie37hb9qataurjt-mysql.services.clever-cloud.com";
-  $username = "uyn3ieoabrdydg0k";
-  $password = "XyoRz4khyfh27MMn5TeE";
-  $dbname = "bncjpie37hb9qataurjt";
+  $servername = "bqgwxblgaohhiogylvnt-mysql.services.clever-cloud.com";
+  $username = "ukycwrgkfpwjwphl";
+  $password = "T8TpccLSsiSoNeitHtjS";
+  $dbname = "bqgwxblgaohhiogylvnt";
   $port = "your-new-port";
 
   try {

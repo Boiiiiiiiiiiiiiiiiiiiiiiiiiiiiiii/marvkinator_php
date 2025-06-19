@@ -141,13 +141,10 @@ $randomTrait = $candidates[array_rand($candidates)];
 
 // Считаем редукцию
 $reduction = $previousCount - $currentCount;
-$ratio     = $previousCount > 0 ? $reduction / $previousCount : 0;
+$ratio = $previousCount > 0 ? $reduction / $previousCount : 0;
 
 echo json_encode([
-    "trait"          => $randomTrait,
-    "previous_count" => $previousCount,
-    "current_count"  => $currentCount,
-    "reduction"      => $reduction,
-    "ratio"          => $ratio
+    "trait" => $randomTrait,
+    "ratio" => $ratio
 ]);
 ?>
